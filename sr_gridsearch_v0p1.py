@@ -261,28 +261,7 @@ for run in range(run0, n_runs):
                                    n_jobs     = -1,
                                    refit      = True)
             
-            #Multi-layer perceptron regressor                                     
-            mlpcv = GridSearchCV(estimator  = MLPRegressor(random_state = random_seed), 
-                                 param_grid = {'hidden_layer_sizes':[(20), (30), (50), (100),
-                                                                     (20,20), (50,50), (10,10,10)],
-                                               'activation':['identity', 'logistic', 'tanh', 'relu'],
-                                               },
-                                 cv         = cv, 
-                                 scoring    = 'neg_root_mean_squared_error',
-                                 n_jobs     = -1,
-                                 refit      = True)
-
-            #Extreme Learning Machine
-            elmcv = GridSearchCV(ELMRegressor(alpha = 1,
-                                              random_state=random_seed), 
-                                 param_grid = {'n_hidden':[20, 30, 40, 50, 100, 150, 200, 300, 500],
-                                               'activation_func':['identity', 'logistic','tanh','relu',
-                                                                  'swish','gaussian','multiquadric'],
-                                               },
-                                 cv         = cv,
-                                 scoring    = 'neg_root_mean_squared_error',
-                                 n_jobs     = -1,
-                                 refit      = True)
+           
                        
             #Epsilon_Suport Vector Regressor
             svr = GridSearchCV(SVR(max_iter = 1000), 
@@ -330,8 +309,6 @@ for run in range(run0, n_runs):
                 ('MARS', args, random_seed, mars),
                 ('RR'  , args, random_seed, ridgecv),
                 ('SVR' , args, random_seed, svr),
-                ('ELM' , args, random_seed, elmcv),
-                #('MLP' , args, random_seed, mlpcv),
                 ('XGB' , args, random_seed, boost)
             ]
                            

@@ -1,4 +1,4 @@
-# Modeling global solar radiation from environmental inputs using machine learning with automatic model selection: a case study in Tanzania
+# Global horizontal irradiance modeling from environmental inputs using machine learning with automatic model selection: a case study in Tanzania
 
 
 Solar radiation prediction is essential in load control on electrical networks allowing a balanced energy supply in accordance with the network demand. However, obtaining the necessary data for such predictions requires stations with specific equipment, which is generally expensive and scarce. This conflict between the need for data and the difficulty in obtaining it produces a scenario where new and cheaper technologies must be used to mitigate existing problems. In this context, machine learning (ML) models have been satisfactorily used to predict solar radiation in different locations worldwide. 

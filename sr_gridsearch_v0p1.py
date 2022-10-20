@@ -30,15 +30,7 @@ from sklearn.metrics import (r2_score,
                              # f1_score,
                              # precision_score
                              )
-# from sklearn.decomposition import KernelPCA
-# from sklearn.preprocessing import (MinMaxScaler,
-#                                    PolynomialFeatures,
-#                                    Normalizer, 
-#                                    StandardScaler,
-#                                    MaxAbsScaler,
-#                                    FunctionTransformer,
-#                                    QuantileTransformer)
-# from sklearn.pipeline import Pipeline
+
 from sklearn.svm import (SVR, 
                          # LinearSVR
                          )
@@ -50,43 +42,19 @@ from sklearn.linear_model import (# ElasticNet,
                                   LinearRegression,
                                   # Lasso
                                   )
-# from sklearn.neighbors import KNeighborsRegressor
-# from sklearn.tree import DecisionTreeRegressor
-# from sklearn.ensemble import (RandomForestRegressor, 
-#                               AdaBoostRegressor, 
-#                               GradientBoostingRegressor,
-#                               VotingRegressor
-#                               )
+
 from sklearn.neural_network import MLPRegressor
 from pyearth import Earth as MARS
 
-# from sklearn.gaussian_process import GaussianProcessRegressor
-# from sklearn.kernel_ridge import KernelRidge
 from xgboost import  XGBRegressor
-# from sklearn.naive_bayes import GaussianNB
-# from sklearn.gaussian_process.kernels import (RBF, 
-#                                               Matern,
-#                                               RationalQuadratic,
-#                                               ExpSineSquared,
-#                                               DotProduct,
-#                                               ConstantKernel)
-# from read_data_v0p1 import read_data
-#from read_data_v0p2 import read_data
-# from sklearn.kernel_approximation import RBFSampler,SkewedChi2Sampler
+
 from read_data_tanzania import *
 
 
 from util.ELM import  ELMRegressor
-# from util.RBFNN import (RBFNNRegressor, 
-#                         RBFNN)
-# from util.LSSVR import LSSVR
 from scipy import stats
 from hydroeval import (kge,
                        nse)
-# from mlxtend.regressor import StackingRegressor
-# from sklearn.linear_model import LinearRegression
-# from sklearn.linear_model import Ridge
-# from sklearn.svm import SVR
 
 warnings.filterwarnings("ignore")
 
@@ -155,28 +123,13 @@ def MAPE(y_true, y_pred):
 basename='Join Data Basis'
 basename='sr_gs_'
 
-#%%
-#Data_1, Data_2 = read_data(0) # 0-> Kfold, 1-> train_test_split(0.2)
-#datasets = [
-#            Data_1, 
-#            Data_2,
-#            ]     
-
-# datasets = [
-#              read_data_tanzania(station='daressalaam', period='daily', model=1),
-#              read_data_tanzania(station='daressalaam', period='daily', model=2),
-#              read_data_tanzania(station='daressalaam', period='daily', model=3),
-#              read_data_tanzania(station='daressalaam', period='daily', model=4),
-#             ]
 
 datasets = []
 for i in range(1,64) :
     datasets.append(read_data_tanzania(station='daressalaam', period='daily', model=i))
     
 #%%----------------------------------------------------------------------------   
-#if len(datasets[0]['X_test']) != 0: 
-#    n_runs = 1
-#%%
+
 pd.options.display.float_format = '{:.3f}'.format
 n_splits    = 5
 scoring     = 'neg_root_mean_squared_error'
@@ -209,7 +162,6 @@ for run in range(run0, n_runs):
             s += 'Number of features         : '+str(n_features)+'\n'
             s += 'Normalization              : '+str(normalize)+'\n'
             s += 'Task                       : '+str(dataset['task'])+'\n'
-            #s += 'Reference                  : '+str(dataset['reference'])+'\n'
             s += '='*80
             s += '\n'            
             feature_names = dataset['feature_names']
@@ -229,20 +181,6 @@ for run in range(run0, n_runs):
                     n_samples_test,
                     n_features)
             #------------------------------------------------------------------         
-            params_gmdh = {'ref_functions'                : ('linear_cov', 'quadratic', 'cubic', 'linear'),
-                           'criterion_type'               : 'test_bias',
-                           'seq_type'                     : 'random',
-                           'feature_names'                : feature_names,
-                           'min_best_neurons_count'       : 5, 
-                           'criterion_minimum_width'      : 5,
-                           'admix_features'               : False,
-                           'max_layer_count'              : 20,
-                           'stop_train_epsilon_condition' : 0.000001,
-                           'layer_err_criterion'          : 'top',
-                           # 'alpha'                        : 0.5,
-                           'normalize'                    : False,
-                           'n_jobs'                       : 1
-                           }   
             
             lr = LinearRegression()
             svr_lin = SVR(kernel = 'linear')
@@ -263,7 +201,6 @@ for run in range(run0, n_runs):
             
            
                        
-            #Epsilon_Suport Vector Regressor
             svr = GridSearchCV(SVR(max_iter = 1000), 
                                param_grid = {'C':[0.001, 0.01, 0.1, 10, 50, 100, 500, 1000, 10000],
                                              'kernel':['rbf','poly','sigmoid','linear'],
@@ -274,14 +211,9 @@ for run in range(run0, n_runs):
                                n_jobs     = -1,
                                refit      = True)
 
-            #XGBoost
             boost = GridSearchCV(estimator  = XGBRegressor(random_state = random_seed), 
-                                 # param_grid = pxgb,
                                  param_grid = {'max_depth' : [3,5,10], # Maximum depth of a tree
                                                'eta'       : [0.1, 0.3, 0.5], # learning_rate
-                                               # 'gamma'     : [0, 1 ,2 ,3],# Minimum loss reduction required to make a further partition on a leaf node of the tree. The larger gamma is, the more conservative the algorithm will be.
-                                               # 'lambda'    : [1,1.5, 2], # L2 regularization term on weights. Increasing this value will make model more conservative.
-                                               # 'alpha'     : [0, 0.5, 1], # L1 regularization term on weights. Increasing this value will make model more conservative.
                                                'n_estimators' : [10, 50, 100, 150, ]
                                                }, 
                                  cv         = cv,
@@ -290,15 +222,10 @@ for run in range(run0, n_runs):
                                  refit      = True)
             
             mars = GridSearchCV(estimator  = MARS(), 
-                                 # param_grid = pxgb,
                                  param_grid = {
                                                'max_degree' : [0,1,2,],
                                                'penalty'    : [1e-3,  1e-1, 1, 10, 100, 1000],
                                                'max_terms'  : [1, 10,  100,  500, ],
-                                               #'penalty'    : [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1000],
-                                               #'max_terms'  : [1, 10, 50, 100, 200, 500, 1000],
-                                               #'' : [],
-                                               #'' : [],
                                                }, 
                                  cv         = cv,
                                  scoring    = 'neg_root_mean_squared_error',
@@ -321,19 +248,15 @@ for run in range(run0, n_runs):
                 s = ''
                 s = '-'*80+'\n'
                 s += 'Estimator                  : '+ clf_name + '\n'
-                #s += 'Function                   : '+ str(fun) + '\n'
                 s += 'Dataset                    : '+ dataset_name + ' -- '+ target + '\n'
                 s += 'Output                     : '+ tn + '\n'
                 s += 'Run                        : '+ str(run) + '\n'
                 s += 'Random seed                : '+ str(random_seed) + '\n'
-                #s+='Optimizer                  : '+algo.get_name()+'\n'                
                 s += '-' * 80 + '\n'
                 print(s)
                
                 
                 if len(X_test)>1:
-                    # pass
-                    # y_train_pred=y_train.copy()
                     clf.fit(X_train, y_train)
                     y_test_pred = clf.predict(X_test).ravel()
                 else:
@@ -347,7 +270,6 @@ for run in range(run0, n_runs):
                          clf.fit(xx_train, yy_train)
                          y_train_pred[test_index] = clf.predict(xx_test).ravel()
 
-                #%%                
                 if n_samples_test == 0:
                     sim={
                          'Y_TRAIN_TRUE'     :y_train,
@@ -364,70 +286,24 @@ for run in range(run0, n_runs):
                          'SCALER'           :None
                          }
                     
-                    # sim['ALGO'] = clf_name
-                    # sim['EST_PARAMS']=clf.best_estimator_.get_params()
-                    # sim['OPT_PARAMS']=clf.best_params_
-                    # #print(clf.best_estimator_.get_params())
-                    
-                    # sim['OUTPUT'] = sim['TARGET'] = target
-                    # sim['SEED']=random_seed
-                    # sim['ACTIVE_VAR_NAMES']=sim['ACTIVE_VAR']=dataset['feature_names']#[sim['ACTIVE_VAR']]
-                    # sim['SCALER']=None
-                    
-# =============================================================================
-#                     pl.figure()#(random_seed+0)
-#                     
-#                     pl.plot(sim['Y_TRAIN_TRUE'].ravel(),
-#                             sim['Y_TRAIN_TRUE'].ravel(),
-#                             'r-',
-#                             sim['Y_TRAIN_TRUE'].ravel(),
-#                             sim['Y_TRAIN_PRED'].ravel(),
-#                             'b.')
-# =============================================================================
+                 
                     
                     r2 = r2_score(sim['Y_TRAIN_TRUE'].ravel(), sim['Y_TRAIN_PRED'].ravel())
                     r = stats.pearsonr(sim['Y_TRAIN_TRUE'].ravel(), sim['Y_TRAIN_PRED'].ravel())[0]
                     rmse = RMSE(sim['Y_TRAIN_TRUE'].ravel(), sim['Y_TRAIN_PRED'].ravel())  
-                    #rmsl=rms(sim['Y_TRAIN_TRUE'].ravel(), sim['Y_TRAIN_PRED'].ravel())                  
-                    #mape=MAPE(sim['Y_TRAIN_TRUE'].ravel(), sim['Y_TRAIN_PRED'].ravel())                  
-                    
+                   
                     scores = '-'*80+'\n'
                     scores += f"R2Score : {r2}" + '\n'
                     scores += f"Rscore  : {r}" + '\n' 
                     scores += f"RMSE    : {rmse}" + '\n' 
-                    # scores += f"RMSL    : {rmsl}" + '\n' 
-                    # scores += f"MAPE    : {mape}" + '\n' 
-                    # scores += f"ACC     : {acc}"  + '\n' 
-                    # scores += f"KGE     : {kge_}" + '\n' 
-                    # scores += f"NSE     : {nse_}" + '\n' 
                     scores += '-'*80+'\n'
 
                     print(scores)
-                    
-# =============================================================================
-#                     pl.ylabel(dataset_name)
-#                     pl.title(sim['EST_NAME']
-#                              + ': (Training) R$^2$='
-#                              + str('%1.3f' % r2)
-#                              + '\t RMSE='
-#                              + str('%1.3f' % rmse)
-#                              # + '\t MAPE='+str('%1.3f' % mape)
-#                              + '\n R='
-#                              + str('%1.3f' % r)
-#                              + '\t MSE='
-#                              + str('%1.3f' % rmse**2)
-#                              # + ', '.join(sim['ACTIVE_VAR_NAMES'])
-#                              )
-#                     
-#                     pl.axes().set_aspect('equal', )
-#                     pl.show()
-# =============================================================================
-                #%%
+           
+      
                 if n_samples_test > 0: 
                     
                     sim={
-                         #'Y_TRAIN_TRUE'     :y_train,
-                         #'Y_TRAIN_PRED'     :y_train_pred,
                          'Y_TEST_TRUE'      :y_test,
                          'Y_TEST_PRED'      :y_test_pred,
                          'EST_NAME'         :clf_name,
@@ -441,28 +317,9 @@ for run in range(run0, n_runs):
                          'ACTIVE_VAR'       :dataset['feature_names'],
                          'SCALER'           :None,
                          }
+                 
                     
-                    # sim['ALGO'] = clf_name
-                    # sim['EST_PARAMS']=clf.best_estimator_.get_params()
-                    # sim['OPT_PARAMS']=clf.best_params_
-                    # #print(clf.best_estimator_.get_params())
-                    
-                    # sim['OUTPUT'] = sim['TARGET'] = target
-                    # sim['SEED']=random_seed
-                    # sim['ACTIVE_VAR_NAMES']=sim['ACTIVE_VAR']=dataset['feature_names']#[sim['ACTIVE_VAR']]
-                    # sim['SCALER']=None
-                    
-                    pl.figure()#(random_seed+1)
-                    #pl.plot(sim['Y_TEST_TRUE'].ravel(), 'r-', sim['Y_TEST_PRED'].ravel(), 'b-' )
-                    
-# =============================================================================
-#                     pl.plot(sim['Y_TEST_TRUE'].ravel(),
-#                             sim['Y_TEST_TRUE'].ravel(), 
-#                             'r-', 
-#                             sim['Y_TEST_TRUE'].ravel(),
-#                             sim['Y_TEST_PRED'].ravel(),
-#                             'b.' )
-# =============================================================================
+                    pl.figure()
                     
                     r2   = r2_score(sim['Y_TEST_TRUE'].ravel(), sim['Y_TEST_PRED'].ravel())
                     r    = stats.pearsonr(sim['Y_TEST_TRUE'].ravel(), sim['Y_TEST_PRED'].ravel())[0]
@@ -486,24 +343,6 @@ for run in range(run0, n_runs):
 
                     print(scores)
                     
-# =============================================================================
-#                     pl.ylabel(dataset_name)
-#                     
-#                     pl.title(sim['EST_NAME']
-#                              + ': (Testing) R$^2$='
-#                              + str('%1.3f' % r2)
-#                              + '\t RMSE='
-#                              + str('%1.3f' % rmse)
-#                              + '\t MAPE='
-#                              + str('%1.3f' % mape)
-#                              + '\n R='+str('%1.3f' % r)
-#                              + '\t NSE='+str('%1.3f' % nse_)
-#                              + '\t KGE='+str('%1.3f' % kge_)
-#                              # + ', '.join(sim['ACTIVE_VAR_NAMES'])
-#                              )
-#                     pl.axes().set_aspect('equal', )
-#                     pl.show()
-# =============================================================================
                     
                     if task == 'forecast' or task == 'regression':
                         pl.figure(figsize=(12,5)); 
@@ -585,7 +424,7 @@ for run in range(run0, n_runs):
 tEnd = t.time()
 print("Total Time:", dt.timedelta(seconds = tEnd - tStart))
 
-#%%
+
 import platform, psutil
 
 def get_size(bytes, suffix="B"):
@@ -612,21 +451,16 @@ text_file.write(f"Version: {uname.version}\n")
 text_file.write(f"Machine: {uname.machine}\n")
 text_file.write(f"Processor: {uname.processor}\n")
 
-# let's print CPU information
 t = "="*40 + " CPU Info " + "="*40 + '\n'
 text_file.write(t)
-# number of cores
 text_file.write(f"Physical cores: {psutil.cpu_count(logical=False)}\n")
 text_file.write(f"Total cores: {psutil.cpu_count(logical=True)}\n")
-# CPU frequencies
 cpufreq = psutil.cpu_freq()
 text_file.write(f"Max Frequency: {cpufreq.max:.2f}Mhz\n")
 text_file.write(f"Min Frequency: {cpufreq.min:.2f}Mhz\n")
 
-# Memory Information
 t = "="*40 + " Memory Information "+ "="*40 + '\n'
 text_file.write(t)
-# get the memory details
 svmem = psutil.virtual_memory()
 text_file.write(f"Total: {get_size(svmem.total)}\n\n")
 

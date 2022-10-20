@@ -17,24 +17,6 @@ from sklearn.model_selection import (GridSearchCV, KFold, cross_val_predict,
                                      LeaveOneOut, KFold, StratifiedKFold,
                                      cross_val_predict,train_test_split)
 #-------------------------------------------------------------------------------
-# def clean_data():
-#     #%%
-#     fn='Solar-Measurements_Tanzania_DarEsSalaam_WB-ESMAP_Raw.csv'
-#     df=pd.read_csv(fn, sep=';')    
-#     y = df[['Year',]].values.ravel()
-#     m = df[['Month',]].values.ravel()
-#     d = df[['Day']].values.ravel()
-#     dt=pd.to_datetime(pd.DataFrame(np.c_[y,m,d], columns=['year', 'month', 'day']), unit='D')
-#     df['Date']=dt    
-#     df = df[df['GHI']>0]
-#     dg = df.groupby('Date').mean()
-#     dg['Date']=dg.index
-#     dg.drop(['Year', 'Month', 'Day', 'Date'], axis=1, inplace=True)
-#     dg.to_csv('daily_tanzania_daressalaam_wb-esmap_qc.csv', )
-    
-    #%%
-
-#%%    
 def read_data_tanzania(station='daressalaam', period='daily',
                    kind='ml', plot=True,
                    scale=False, degree=1, roll=False, window=7,
@@ -42,7 +24,6 @@ def read_data_tanzania(station='daressalaam', period='daily',
             ):
     #%%
     filename='./data/data_tanzania/'+period+'_tanzania_'+station+'_wb-esmap_qc.csv'
-    #filename='./'+period+'_tanzania_'+station+'_wb-esmap_qc.csv'
     data = pd.read_csv(filename, index_col=0, delimiter=',')
    
     date_max = '2017-05-31'; data=data[data.index<=date_max]
@@ -50,38 +31,10 @@ def read_data_tanzania(station='daressalaam', period='daily',
 
     date_range = data.index
     data.columns = [x.replace('_', '-') for x in data.columns]
-    # print(date_range)
     for c in data.columns:
-       #print(c)
        data[c].interpolate(method='linear', inplace=True)
-       #data[c].plot(); pl.show()
 
-    #['T-amb', 'RH', 'WS', 'WS-gst', 'WD', 'WD-st-dev', 'BP']
-    # var_names={
-    #         #1: ['T-amb', 'RH', 'WS', 'WS-gst', 'WD', 'BP'],
-    #         1: ['T-amb', 'RH', 'WS',           'WD', 'BP'],
-    #         2: ['T-amb', 'RH', 'WS',           'WD',     ],
-    #         3: ['T-amb', 'RH',                 'WD',     ],
-    #         4: [         'RH',                 'WD',     ],
-    #         5: ['T-amb', 'RH',                           ],
-    #        #7: ['T-amb', 'RH',                 'WD',     ],
-    #         }
-    
-    # var_names={
-    #      1:  ['T-amb', 'RH', 'WS', 'WS-gst', 'WD', 'BP','DNI', 'DHI', 'WD-st-dev'],
-    #      2:  ['T-amb', 'RH', 'WS',           'WD', 'BP','DNI'],
-    #      3:  ['T-amb', 'RH', 'WS',           'WD',      'DNI'],
-    #      4:  ['T-amb', 'RH',                 'WD',      'DNI'],
-    #      5:  [         'RH',                 'WD',      'DNI'],
-    #      6:  ['T-amb', 'RH',                            'DNI'],
-    #      7:  ['T-amb', 'RH', 'WS', 'WS-gst', 'WD', 'BP','DNI',        'WD-st-dev'],
-    #      8:  ['T-amb', 'RH', 'WS', 'WS-gst', 'WD', 'BP',              'WD-st-dev'],
-    #      9:  ['T-amb', 'RH', 'WS',           'WD', 'BP'],
-    #      10: ['T-amb', 'RH', 'WS',           'WD',     ],
-    #      11: ['T-amb', 'RH',                 'WD',     ],
-    #      12: [         'RH',                 'WD',     ],
-    #      13: ['T-amb', 'RH',                           ],
-    #      }
+   
     
     from itertools  import combinations
     count=1
@@ -113,21 +66,14 @@ def read_data_tanzania(station='daressalaam', period='daily',
             pl.subplot(len(df.columns), 1, i+1)
             df[group].iloc[id0].plot(marker='', label='Training')#,fontsize=16,)#pyplot.plot(dataset[group].values)
             df[group].iloc[id1].plot(marker='', label='Test')#,fontsize=16,)#pyplot.plot(dataset[group].values)
-            #pl.title(group, y=0.5, loc='right')
             data[data.columns[i]].plot(marker='', lw=0)
             pl.axvline(n, color='k', ls='-.')
-            # pl.xlabel('Year')
-            #pl.legend(loc=(1.01,0.5))
             pl.ylabel(group)
         fig.autofmt_xdate(rotation=30,)            
         pl.show()
-    #%%
-    # variable_names, target_names = [#'DNI', 
-    #                                 #'DHI',
-    #                                 'T-amb', 'RH', 'WS', 'WS-gst', 'WD', 'WD-st-dev', 'BP'], ['GHI']
     
     X=data[variable_names]
-    y=data[target_names]#/1e3
+    y=data[target_names]
 
 
     import seaborn as sns
@@ -177,9 +123,7 @@ def read_data_tanzania(station='daressalaam', period='daily',
       'X_test'          : X_test,
       'y_train'         : y_train.reshape(1,-1),
       'y_test'          : y_test.reshape(1,-1),      
-      #'y_min'           : y_scaler.data_min_[0],
-      #'y_max'           : y_scaler.data_max_[0],
-      'targets'         : target_names,
+     'targets'         : target_names,
       'true_labels'     : None,
       'predicted_labels': None,
       'descriptions'    : 'None',
@@ -191,73 +135,12 @@ def read_data_tanzania(station='daressalaam', period='daily',
     #%%
     return regression_data
     #%%
-    
-def read_tanzania_stations(period='daily',plot=False,):
-    #%%
-    datasets = [
-        read_data_tanzania(station='daressalaam', period=period, scale=False),
-    ]
-    
-    for ds in datasets:
-        print('%19s'%ds['name'], ds['X_train'].shape, ds['X_test'].shape, ds['date_range'][0], ds['date_range'][-1])
-       
         
-    n_features, n_samples, n_datasets = ds['X_train'].shape[1],ds['X_train'].shape[0],len(datasets)
-    X_train = np.zeros((n_samples, n_features, n_datasets,))
-    y_train = np.zeros((n_samples, n_datasets,))
-    
-    stations=[]
-    for i,ds in enumerate(datasets):
-        n_features = len(ds['feature_names'])
-        n_samples  = ds['X_train'].shape[0]
-        #print(n_features,n_samples)
-        X_train[:,:,i] =  ds['X_train']
-        y_train[:,i] =  ds['y_train']
-        stations.append([ds['name']])
-    
-    n_features, n_samples, n_datasets = ds['X_test'].shape[1],ds['X_test'].shape[0],len(datasets)
-    X_test = np.zeros((n_samples, n_features, n_datasets,))
-    y_test = np.zeros((n_samples, n_datasets,))
-    
-    for i,ds in enumerate(datasets):
-        n_features = len(ds['feature_names'])
-        n_samples  = ds['X_test'].shape[0]
-        #print(n_features,n_samples)
-        X_test[:,:,i] =  ds['X_test']
-        y_test[:,i] =  ds['y_test']
-
-    n_samples, n_features, _ = X_train.shape
-    variable_names=['x_'+str(i) for i in range(n_features)] #np.array(X_train.columns)
-    target_names=['y_'+str(i) for i in range(n_datasets)]#np.array(y_train.columns)
-    data_description = ['var_'+str(i) for i in range(X_train.shape[1])]
-    #sn = os.path.basename(filename).split('-')[0].split('/')[-1]
-    dataset=  {
-      #'task':'forecast',
-      'task':'regression',
-      'name':'Solar Radiation Vietnam',
-      'feature_names':variable_names,'target_names':target_names,
-      'n_samples':n_samples, 'n_features':n_features,
-      'X_train':X_train,
-      'X_test':X_test,
-      'y_train':y_train,
-      'y_test':y_test,
-      'targets':target_names,
-      'true_labels':None,
-      'predicted_labels':None,
-      'descriptions':data_description,
-      'items':None,
-      'reference':"",      
-      'stations':stations,
-      'normalize': 'MinMax',
-      }   
-    #%%
-    return dataset    
-    
 #%%-----------------------------------------------------------------------------
 if __name__ == "__main__":
     datasets = [                 
-            read_tanzania_stations(period='daily',plot=True,)
-            ]
+            read_data_tanzania(station='daressalaam', period='daily', model=i, plot=True,)
+            ] 
     for D in datasets:
         print('='*80+'\n'+D['name']+'\n'+'='*80)
         print(D['reference'])

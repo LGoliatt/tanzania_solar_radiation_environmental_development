@@ -14,33 +14,14 @@ import os
 # import getopt
 from sklearn.model_selection import (GridSearchCV, 
                                      KFold, 
-                                     # TimeSeriesSplit, 
-                                     # cross_val_score, 
-                                     # LeaveOneOut, 
-                                     # StratifiedKFold,
-                                     # cross_val_predict,
-                                     # train_test_split
                                      )
 from sklearn.metrics import (r2_score,
-                             # max_error,
-                             # mean_squared_error, 
-                             # mean_absolute_error, 
-                             # median_absolute_error,
-                             # accuracy_score,
-                             # f1_score,
-                             # precision_score
                              )
 
-from sklearn.svm import (SVR, 
-                         # LinearSVR
-                         )
-from sklearn.linear_model import (# ElasticNet, 
-                                  Ridge, 
-                                  # PassiveAggressiveRegressor, 
-                                  # LogisticRegression, 
-                                  # BayesianRidge, 
+from sklearn.svm import (SVR,)
+from sklearn.linear_model import (
+                                  Ridge,
                                   LinearRegression,
-                                  # Lasso
                                   )
 
 from sklearn.neural_network import MLPRegressor
@@ -60,7 +41,7 @@ warnings.filterwarnings("ignore")
 
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
-    os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
+    os.environ["PYTHONWARNINGS"] = "ignore" 
 
 tStart = t.time()
 

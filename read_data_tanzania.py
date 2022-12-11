@@ -64,8 +64,8 @@ def read_data_tanzania(station='daressalaam', period='daily',
         fig=pl.figure(figsize=(6,8))
         for i,group in enumerate(df.columns):
             pl.subplot(len(df.columns), 1, i+1)
-            df[group].iloc[id0].plot(marker='', label='Training')#,fontsize=16,)#pyplot.plot(dataset[group].values)
-            df[group].iloc[id1].plot(marker='', label='Test')#,fontsize=16,)#pyplot.plot(dataset[group].values)
+            df[group].iloc[id0].plot(marker='', label='Training')
+            df[group].iloc[id1].plot(marker='', label='Test')
             data[data.columns[i]].plot(marker='', lw=0)
             pl.axvline(n, color='k', ls='-.')
             pl.ylabel(group)
